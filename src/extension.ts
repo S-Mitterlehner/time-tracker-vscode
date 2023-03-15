@@ -1,8 +1,16 @@
 import * as vscode from 'vscode';
+import { FileManager } from './file-manager';
 import { TimeTracker } from './time-tracker';
 
 export function activate(context: vscode.ExtensionContext) {
-  const timeTracker = new TimeTracker();
+  const rootPath = vscode.workspace.rootPath;
+  if (!rootPath) {
+    throw new Error('Unable to find root path.');
+  }
+
+  const filePath = `${rootPath}/.vscode/times.json`;
+  const fileManager = new FileManager(filePath);
+  const timeTracker = new TimeTracker(fileManager);
 
   context.subscriptions.push(
     vscode.commands.registerCommand('time-tracker.startTrackingTime', () => {

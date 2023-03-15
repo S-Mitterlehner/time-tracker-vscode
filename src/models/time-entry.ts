@@ -1,5 +1,5 @@
 interface TimeEntry {
-  from: number;
-  till: number;
+  from: Date;
+  till: Date;
   comment?: string;
 }
