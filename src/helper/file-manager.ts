@@ -5,23 +5,16 @@ const formattedRegex = /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/;
 const utcRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 
 export class FileManager {
-  private readonly filePath: string;
-
-  constructor(filePath: string) {
-    this.filePath = filePath;
-  }
-
-  public writeToFile(data: any) {
-    const folder = path.dirname(this.filePath);
+  public writeToFile(filePath: string, data: any) {
+    const folder = path.dirname(filePath);
 
     if (!fs.existsSync(folder)) {
       fs.mkdirSync(folder, { recursive: true });
     }
 
     fs.writeFileSync(
-      this.filePath,
+      filePath,
       JSON.stringify(data, (key, value) => {
-        //TODO: make better
         if (utcRegex.test(value.toString())) {
           value = new Date(Date.parse(value));
           const year = value.getFullYear();
@@ -38,12 +31,12 @@ export class FileManager {
     );
   }
 
-  public readFromFile() {
-    if (!fs.existsSync(this.filePath)) {
+  public readFromFile(filePath: string) {
+    if (!fs.existsSync(filePath)) {
       return null;
     }
 
-    const data = fs.readFileSync(this.filePath, 'utf8');
+    const data = fs.readFileSync(filePath, 'utf8');
     return JSON.parse(data, (key, value) => {
       if (typeof value === 'string' && formattedRegex.test(value)) {
         return new Date(Date.parse(value));

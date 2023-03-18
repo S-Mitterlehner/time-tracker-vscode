@@ -1,50 +1,62 @@
-import * as vscode from 'vscode';
-import { FileManager } from './file-manager';
+/**
+ *
+ * THIS IS THE OLD VERSION -> Remove after rework
+ *
+ *
+ */
 
-export class TimeTracker {
-  private startTime: Date | undefined;
+// import * as vscode from 'vscode';
+// import { FileManager } from './helper/file-manager';
+// import { TimeEntry } from './models/time-entry';
 
-  constructor(private fileManager: FileManager) {}
+// export class TimeTracker {
+//   private startTime: Date | undefined;
 
-  public start() {
-    if (this.startTime) {
-      vscode.window.showErrorMessage('Work time is already being tracked.');
-      return;
-    }
+//   constructor(private fileManager: FileManager) {}
 
-    this.startTime = new Date();
-  }
+//   public start() {
+//     if (this.startTime) {
+//       vscode.window.showErrorMessage('Work time is already being tracked.');
+//       return;
+//     }
 
-  public stop(comment?: string) {
-    if (!this.startTime) {
-      vscode.window.showErrorMessage('Work time is not being tracked.');
-      return;
-    }
+//     this.startTime = new Date();
+//   }
 
-    const data: TimeEntry[] = this.fileManager.readFromFile() || [];
-    data.push({ from: this.startTime, till: new Date(), comment: comment });
-    this.fileManager.writeToFile(data);
+//   public stop(comment?: string) {
+//     if (!this.startTime) {
+//       vscode.window.showErrorMessage('Work time is not being tracked.');
+//       return;
+//     }
 
-    this.startTime = undefined;
-  }
+//     const data: TimeEntry[] = this.fileManager.readFromFile() || [];
+//     data.push({ from: this.startTime, till: new Date(), comment: comment });
+//     this.fileManager.writeToFile(data);
 
-  public getTotalTime() {
-    const data = this.fileManager.readFromFile();
-    if (!data || !data || data.length === 0) {
-      vscode.window.showInformationMessage('No work time has been tracked yet.');
-      return;
-    }
+//     this.startTime = undefined;
+//   }
 
-    const totalDurationInSeconds = data.reduce((total: number, entry: any) => total + this.getSeconds(entry.from, entry.till), 0);
-    const hours = Math.floor(totalDurationInSeconds / 3600);
-    const minutes = Math.floor((totalDurationInSeconds % 3600) / 60);
-    const seconds = Math.floor(totalDurationInSeconds % 60);
-    const message = `Total work time: ${hours} hours, ${minutes} minutes, ${seconds} seconds.`;
+//   public getTotalTime() {
+//     const data = this.fileManager.readFromFile();
+//     if (!data || !data.entries || data.entries.length === 0) {
+//       vscode.window.showInformationMessage('No work time has been tracked yet.');
+//       return;
+//     }
 
-    vscode.window.showInformationMessage(message);
-  }
+//     const totalDurationInSeconds = data.entries.reduce((total: number, entry: TimeEntry) => total + this.getSeconds(entry.from, entry.till), 0);
+//     const hours = Math.floor(totalDurationInSeconds / 3600);
+//     const minutes = Math.floor((totalDurationInSeconds % 3600) / 60);
+//     const seconds = Math.floor(totalDurationInSeconds % 60);
+//     const message = `Total work time: ${hours} hours, ${minutes} minutes, ${seconds} seconds.`;
 
-  private getSeconds(start: Date, end: Date) {
-    return (end.getTime() - start.getTime()) / 1000;
-  }
-}
+//     vscode.window.showInformationMessage(message);
+//   }
+
+//   public isTracking(): boolean {
+//     return !!this.startTime;
+//   }
+
+//   private getSeconds(start: Date, end: Date) {
+//     return (end.getTime() - start.getTime()) / 1000;
+//   }
+// }

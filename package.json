@@ -9,24 +9,28 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onCommand:extension.startTrackingWorkTime",
+    "onCommand:extension.stopTrackingWorkTime",
+    "onCommand:extension.getTotalTime",
+    "workspaceContains:.vscode/times.json"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-          "command": "time-tracker.startTrackingTime",
-          "title": "Time-Tracker: Start Tracking Work Time"
+        "command": "time-tracker.startTrackingTime",
+        "title": "Time-Tracker: Start Tracking Work Time"
       },
       {
-          "command": "time-tracker.stopTrackingTime",
-          "title": "Time-Tracker: Stop Tracking Work Time"
+        "command": "time-tracker.stopTrackingTime",
+        "title": "Time-Tracker: Stop Tracking Work Time"
       },
       {
-          "command": "time-tracker.totalTimeSpent",
-          "title": "Time-Tracker: Total Time Spent"
+        "command": "time-tracker.totalTimeSpent",
+        "title": "Time-Tracker: Total Time Spent"
       }
-  ]
-  
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
