@@ -1,8 +1,12 @@
 {
   "name": "time-tracker",
-  "displayName": "time-tracker",
-  "description": "",
+  "displayName": "Time Tracker",
+  "description": "Extension to track time spent on projects and keep the data save in your folder",
   "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/S-Mitterlehner/time-tracker-vscode"
+  },
   "engines": {
     "vscode": "^1.76.0"
   },
@@ -14,23 +18,23 @@
   "contributes": {
     "commands": [
       {
-          "command": "time-tracker.startTrackingTime",
-          "title": "Time-Tracker: Start Tracking Work Time"
+        "command": "time-tracker.startTrackingTime",
+        "title": "Time-Tracker: Start Tracking Work Time"
       },
       {
-          "command": "time-tracker.stopTrackingTime",
-          "title": "Time-Tracker: Stop Tracking Work Time"
+        "command": "time-tracker.stopTrackingTime",
+        "title": "Time-Tracker: Stop Tracking Work Time"
       },
       {
-          "command": "time-tracker.totalTimeSpent",
-          "title": "Time-Tracker: Total Time Spent"
+        "command": "time-tracker.totalTimeSpent",
+        "title": "Time-Tracker: Total Time Spent"
       }
-  ]
-  
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
     "compile": "webpack",
+    "build": "vsce package --out dist/",
     "watch": "webpack --watch",
     "package": "webpack --mode production --devtool hidden-source-map",
     "compile-tests": "tsc -p . --outDir out",
