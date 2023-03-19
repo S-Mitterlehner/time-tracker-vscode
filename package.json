@@ -13,7 +13,12 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onCommand:extension.startTrackingWorkTime",
+    "onCommand:extension.stopTrackingWorkTime",
+    "onCommand:extension.getTotalTime",
+    "workspaceContains:.vscode/times.json"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [

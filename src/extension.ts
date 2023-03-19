@@ -1,36 +1,49 @@
 import * as vscode from 'vscode';
-import { FileManager } from './file-manager';
-import { TimeTracker } from './time-tracker';
+import { FileManager } from './services/file-manager';
+import { TimeTracker } from './services/time-tracker';
+import { VSCodeInteractionService } from './services/vscode-service';
 
-export function activate(context: vscode.ExtensionContext) {
-  const rootPath = vscode.workspace.rootPath;
-  if (!rootPath) {
-    throw new Error('Unable to find root path.');
-  }
+const fileManager = new FileManager();
+const vscService = new VSCodeInteractionService();
+const timeTracker = new TimeTracker(fileManager, vscService);
 
-  const filePath = `${rootPath}/.vscode/times.json`;
-  const fileManager = new FileManager(filePath);
-  const timeTracker = new TimeTracker(fileManager);
-
+export async function activate(context: vscode.ExtensionContext): Promise<void> {
   context.subscriptions.push(
-    vscode.commands.registerCommand('time-tracker.startTrackingTime', () => {
-      timeTracker.start();
-      vscode.window.showInformationMessage('Started tracking work time.');
+    vscode.commands.registerCommand('time-tracker.startTrackingTime', async () => {
+      try {
+        await timeTracker.startTracking();
+      } catch (error: any) {
+        vscode.window.showErrorMessage(error.message);
+      }
     }),
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('time-tracker.stopTrackingTime', () => {
-      vscode.window.showInputBox({ prompt: 'Enter a comment (optional):' }).then((comment?: string) => {
-        timeTracker.stop(comment);
-        vscode.window.showInformationMessage('Stopped tracking work time.');
-      });
+    vscode.commands.registerCommand('time-tracker.stopTrackingTime', async () => {
+      try {
+        await timeTracker.stopTracking();
+      } catch (error: any) {
+        vscode.window.showErrorMessage(error.message);
+      }
     }),
   );
 
   context.subscriptions.push(
     vscode.commands.registerCommand('time-tracker.totalTimeSpent', () => {
-      timeTracker.getTotalTime();
+      timeTracker.printTime();
     }),
   );
+
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeWorkspaceFolders(async (event) => {
+      await timeTracker.stopTracking();
+      await timeTracker.init();
+    }),
+  );
+
+  await timeTracker.init();
+}
+
+export async function deactivate(): Promise<void> {
+  await timeTracker.stopTracking();
 }

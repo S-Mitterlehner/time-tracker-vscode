@@ -1,5 +1,5 @@
-interface TimeEntry {
+export interface TimeEntry {
   from: Date;
-  till: Date;
+  till?: Date;
   comment?: string;
 }
