@@ -3,6 +3,13 @@
   "displayName": "Time Tracker",
   "description": "Extension to track time spent on projects and keep the data save in your folder",
   "version": "1.0.0",
+  "author": {
+    "name": "Stefan Mitterlehner",
+    "url": "https://www.mitterlehner.click"
+  },
+  "publisher": "S-Mitterlehner",
+  "license": "MIT",
+  "pricing": "free",
   "repository": {
     "type": "git",
     "url": "https://github.com/S-Mitterlehner/time-tracker-vscode"
@@ -22,6 +29,10 @@
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
+      {
+        "command": "time-tracker.init",
+        "title": "Time-Tracker: Init"
+      },
       {
         "command": "time-tracker.startTrackingTime",
         "title": "Time-Tracker: Start Tracking Work Time"
