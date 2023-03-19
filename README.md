@@ -1,5 +1,7 @@
 # Work Time Tracker
 
+[Install from Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=S-Mitterlehner.time-tracker-vscode)
+
 ![Work Time Tracker demo gif](./docs/media/intro.gif)
 
 A Visual Studio Code extension for tracking your work time.
@@ -29,20 +31,6 @@ NOTE: This is only possible with version `2+` (for more information see below).
 After you changed the `times.json`, you have to reload the file by activating the command `Time-Tracker: Init` or reopening VS-Code.
 
 Once you activated Multiple Projects you can start a new tracking. If you do, you should be asked to insert a Project-Name.
-
-## Configuration
-
-No configuration is required.
-
-## Known Issues
-
-None.
-
-## Release Notes
-
-### 1.0.0
-
-Initial release of Work Time Tracker.
 
 ## Credits
 
