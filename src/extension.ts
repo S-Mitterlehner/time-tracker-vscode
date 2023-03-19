@@ -8,6 +8,8 @@ const vscService = new VSCodeInteractionService();
 const timeTracker = new TimeTracker(fileManager, vscService);
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
+  context.subscriptions.push(vscode.commands.registerCommand('time-tracker.init', async () => await timeTracker.init()));
+
   context.subscriptions.push(
     vscode.commands.registerCommand('time-tracker.startTrackingTime', async () => {
       try {

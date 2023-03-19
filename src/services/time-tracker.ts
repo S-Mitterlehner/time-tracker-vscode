@@ -17,7 +17,7 @@ export class TimeTracker implements ITimeTracker {
   private _content!: FileContent;
   private _version: string = '1';
 
-  project: string = 'index';
+  project?: string;
 
   constructor(private fileManager: FileManager, private interaction: IInteractionService) {}
 
@@ -27,6 +27,7 @@ export class TimeTracker implements ITimeTracker {
   }
 
   async init(): Promise<void> {
+    this.project = undefined;
     this._version = '';
     this._content = this.fileManager.readFromFile(path.resolve(this.interaction.getWorkspacePath(), FILE_REL_PATH));
     if (!this._content) {
@@ -75,6 +76,7 @@ export class TimeTracker implements ITimeTracker {
 
     this.fileManager.writeToFile(path.resolve(this.interaction.getWorkspacePath(), FILE_REL_PATH), this._content);
     this.interaction.showInformationMessage('Stopped tracking work time.');
+    this.project = undefined;
   }
 
   async printTime(): Promise<void> {
@@ -134,9 +136,13 @@ export class TimeTracker implements ITimeTracker {
       case '2':
         const contentV2 = this._content as FileContentV2;
         if (!contentV2.times) return undefined;
-        if (!this.project) throw new Error('No project selected.');
-        const times = contentV2.times[this.project];
-        return times.find((x) => x.till === undefined);
+
+        for (let key of Object.keys(contentV2.times)) {
+          const times = contentV2.times[key];
+          const r = times.find((x) => x.till === undefined);
+          if (r) return r;
+        }
+        return undefined;
       default:
         throw new Error(`Unknown version: ${this._version}`);
     }
