@@ -1,13 +1,18 @@
 import * as vscode from 'vscode';
+import { IInteractionService } from '../interfaces/interaction-service.interface';
 
-export interface IInteractionService {
-  showInformationMessage(message: string): void;
-  showInputBox(message: string, placeholder: string | undefined, suggestions: string[]): Promise<string | undefined>;
-  showYesNoQuestion(message: string): Promise<boolean>;
-  showQuickPick(message: string, values: string[]): Promise<string>;
-}
+export class VSCodeInteractionService implements IInteractionService {
+  getWorkspacePath(): string {
+    try {
+      const result = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
+      if (!result) throw new Error('No workspace opened');
+      console.log('getWorkspacePath', result);
+      return result;
+    } catch (e) {
+      throw new Error('No workspace opened');
+    }
+  }
 
-export class VSCodeService implements IInteractionService {
   showInformationMessage(message: string): void {
     vscode.window.showInformationMessage(message);
   }

@@ -1,20 +1,14 @@
-import path = require('path');
-import { FileManager } from '../helper/file-manager';
+import * as path from 'path';
+import { FileManager } from './file-manager';
+import { IInteractionService } from '../interfaces/interaction-service.interface';
+import { ITimeTracker } from '../interfaces/time-tracker.interface';
 import { FileContent, FileContentV1, FileContentV2, create } from '../models/file-content';
 import { TimeEntry } from '../models/time-entry';
-import { IInteractionService } from './vscode-service';
 
 export enum TrackingStatus {
   NotTracking = 'NotTracking',
   Tracking = 'Tracking',
   NotInWorkspace = 'NotInWorkspace',
-}
-
-export interface ITimeTracker {
-  get trackingStatus(): TrackingStatus;
-  startTracking(): Promise<void>;
-  stopTracking(): Promise<void>;
-  getTotalTimeMin(): Promise<number>;
 }
 
 const FILE_REL_PATH = '.vscode/times.json';
@@ -25,10 +19,19 @@ export class TimeTracker implements ITimeTracker {
 
   project: string = 'index';
 
-  constructor(private _fileManager: FileManager, private _workspacePath: string, private interaction: IInteractionService) {
-    this._content = this._fileManager.readFromFile(path.resolve(this._workspacePath, FILE_REL_PATH));
+  constructor(private fileManager: FileManager, private interaction: IInteractionService) {}
+
+  get trackingStatus(): TrackingStatus {
+    const result = this._getCurrentEntry() !== undefined ? TrackingStatus.Tracking : TrackingStatus.NotTracking;
+    return result;
+  }
+
+  async init(): Promise<void> {
+    this._version = '';
+    this._content = this.fileManager.readFromFile(path.resolve(this.interaction.getWorkspacePath(), FILE_REL_PATH));
     if (!this._content) {
       this._content = create();
+      this._version = this._content.version;
     } else {
       if ((this._content as any)['version']) {
         this._version = (this._content as FileContentV2).version;
@@ -38,11 +41,8 @@ export class TimeTracker implements ITimeTracker {
     }
   }
 
-  get trackingStatus(): TrackingStatus {
-    return this._getCurrentEntry() !== undefined ? TrackingStatus.Tracking : TrackingStatus.NotTracking;
-  }
-
   async startTracking() {
+    if (this.trackingStatus === TrackingStatus.Tracking) throw new Error('Already tracking.');
     switch (this._version) {
       case '1':
         const contentV1 = this._content as FileContentV1;
@@ -62,7 +62,7 @@ export class TimeTracker implements ITimeTracker {
       default:
         throw new Error(`Unknown version: ${this._version}`);
     }
-    this._fileManager.writeToFile(path.resolve(this._workspacePath, FILE_REL_PATH), this._content);
+    this.fileManager.writeToFile(path.resolve(this.interaction.getWorkspacePath(), FILE_REL_PATH), this._content);
     this.interaction.showInformationMessage('Started tracking work time.');
   }
 
@@ -73,24 +73,33 @@ export class TimeTracker implements ITimeTracker {
     current.comment = await this.interaction.showInputBox('Enter a comment (optional):', undefined, []);
     current.till = new Date();
 
-    this._fileManager.writeToFile(path.resolve(this._workspacePath, FILE_REL_PATH), this._content);
+    this.fileManager.writeToFile(path.resolve(this.interaction.getWorkspacePath(), FILE_REL_PATH), this._content);
     this.interaction.showInformationMessage('Stopped tracking work time.');
   }
 
-  async getTotalTimeMin(): Promise<number> {
+  async printTime(): Promise<void> {
+    let seconds = 0;
     switch (this._version) {
       case '1':
         const contentV1 = this._content as FileContentV1;
-        return contentV1.reduce((sum, x) => sum + this._getTimeMin(x), 0);
+        seconds = contentV1.reduce((sum, x) => sum + this._getTimeSec(x), 0);
+        break;
       case '2':
         const contentV2 = this._content as FileContentV2;
-        if (!contentV2.times) return 0;
+        if (!contentV2.times) break;
         let project = await this._getProject(false);
         const times = contentV2.times[project];
-        return times.reduce((sum, x) => sum + this._getTimeMin(x), 0);
+        seconds = times.reduce((sum, x) => sum + this._getTimeSec(x), 0);
+        break;
       default:
         throw new Error(`Unknown version: ${this._version}`);
     }
+
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds - hours * 3600) / 60);
+    seconds = Math.floor(seconds - hours * 3600 - minutes * 60);
+
+    this.interaction.showInformationMessage(`You have worked ${hours} hour(s) ${minutes} minute(s) ${seconds} second(s).`);
   }
 
   private async _getProject(allowNew: boolean = true): Promise<string> {
@@ -113,8 +122,8 @@ export class TimeTracker implements ITimeTracker {
     }
   }
 
-  private _getTimeMin(entry: TimeEntry) {
-    return (entry.till ?? new Date()).getTime() - entry.from.getTime() / 1000 / 60;
+  private _getTimeSec(entry: TimeEntry) {
+    return ((entry.till ?? new Date()).getTime() - entry.from.getTime()) / 1000;
   }
 
   private _getCurrentEntry(): TimeEntry | undefined {

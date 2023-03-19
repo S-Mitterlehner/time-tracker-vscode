@@ -6,6 +6,7 @@ const utcRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 
 export class FileManager {
   public writeToFile(filePath: string, data: any) {
+    console.log('writeToFile', filePath, data);
     const folder = path.dirname(filePath);
 
     if (!fs.existsSync(folder)) {
@@ -15,7 +16,7 @@ export class FileManager {
     fs.writeFileSync(
       filePath,
       JSON.stringify(data, (key, value) => {
-        if (utcRegex.test(value.toString())) {
+        if (value !== undefined && utcRegex.test(value.toString())) {
           value = new Date(Date.parse(value));
           const year = value.getFullYear();
           const month = ('00' + (value.getMonth() + 1)).slice(-2);
