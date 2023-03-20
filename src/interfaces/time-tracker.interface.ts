@@ -1,4 +1,4 @@
-import { TrackingStatus } from '../services/time-tracker';
+import { TrackingStatus } from '../enums/tracking-status';
 
 export interface ITimeTracker {
   get trackingStatus(): TrackingStatus;

@@ -2,14 +2,10 @@ import * as path from 'path';
 import { FileManager } from './file-manager';
 import { IInteractionService } from '../interfaces/interaction-service.interface';
 import { ITimeTracker } from '../interfaces/time-tracker.interface';
-import { FileContent, FileContentV1, FileContentV2, create } from '../models/file-content';
+import { FileContent, FileContentV1, FileContentV2, create, CURRENT_VERSION } from '../models/file-content';
 import { TimeEntry } from '../models/time-entry';
-
-export enum TrackingStatus {
-  NotTracking = 'NotTracking',
-  Tracking = 'Tracking',
-  NotInWorkspace = 'NotInWorkspace',
-}
+import { TrackingStatus } from '../enums/tracking-status';
+import { MigratorFactory } from '../migrators/factory.migrator';
 
 const FILE_REL_PATH = '.vscode/times.json';
 
@@ -19,7 +15,7 @@ export class TimeTracker implements ITimeTracker {
 
   project?: string;
 
-  constructor(private fileManager: FileManager, private interaction: IInteractionService) {}
+  constructor(private fileManager: FileManager, private interaction: IInteractionService, private migratorFactory: MigratorFactory) {}
 
   get trackingStatus(): TrackingStatus {
     const result = this._getCurrentEntry() !== undefined ? TrackingStatus.Tracking : TrackingStatus.NotTracking;
@@ -30,6 +26,7 @@ export class TimeTracker implements ITimeTracker {
     this.project = undefined;
     this._version = '';
     this._content = this.fileManager.readFromFile(path.resolve(this.interaction.getWorkspacePath(), FILE_REL_PATH));
+
     if (!this._content) {
       this._content = create();
       this._version = this._content.version;
@@ -40,6 +37,26 @@ export class TimeTracker implements ITimeTracker {
         this._version = '1';
       }
     }
+
+    if (this._version < CURRENT_VERSION) {
+      this.interaction.showYesNoQuestion('Do you want to migrate to the newest version?').then((result) => {
+        if (result) this.migrate();
+      });
+    }
+
+    this.interaction.setButtonStatus(this.trackingStatus);
+  }
+
+  migrate(): void {
+    if (this._version >= CURRENT_VERSION) {
+      this.interaction.showInformationMessage('times.json is already on the newest version.');
+      return;
+    }
+
+    this._content = this.migratorFactory.getMigrator(this._version, CURRENT_VERSION)?.migrate(this._content as FileContent) as FileContent;
+    this._version = CURRENT_VERSION;
+    this.fileManager.writeToFile(path.resolve(this.interaction.getWorkspacePath(), FILE_REL_PATH), this._content);
+    this.interaction.showInformationMessage('times.json has been migrated to the newest version.');
   }
 
   async startTracking() {
@@ -64,6 +81,7 @@ export class TimeTracker implements ITimeTracker {
         throw new Error(`Unknown version: ${this._version}`);
     }
     this.fileManager.writeToFile(path.resolve(this.interaction.getWorkspacePath(), FILE_REL_PATH), this._content);
+    this.interaction.setButtonStatus(TrackingStatus.Tracking);
     this.interaction.showInformationMessage('Started tracking work time.');
   }
 
@@ -75,6 +93,7 @@ export class TimeTracker implements ITimeTracker {
     current.till = new Date();
 
     this.fileManager.writeToFile(path.resolve(this.interaction.getWorkspacePath(), FILE_REL_PATH), this._content);
+    this.interaction.setButtonStatus(TrackingStatus.NotTracking);
     this.interaction.showInformationMessage('Stopped tracking work time.');
     this.project = undefined;
   }
