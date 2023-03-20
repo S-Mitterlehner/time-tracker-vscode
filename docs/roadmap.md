@@ -2,7 +2,11 @@
 
 ## Planned Features
 
+- customize location of `times.json` via settings
+- activate `allowMultipleProjects` via command
 - Icon/Logo
+- Times-Overview (Page)
+  - Charts?
 
 ## Released Features
 
