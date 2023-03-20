@@ -1,5 +1,6 @@
 import { TimeEntry } from './time-entry';
 
+export const CURRENT_VERSION = '2';
 export type FileContent = FileContentV1 | FileContentV2;
 export type NewestContentVersion = FileContentV2;
 

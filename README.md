@@ -32,6 +32,12 @@ After you changed the `times.json`, you have to reload the file by activating th
 
 Once you activated Multiple Projects you can start a new tracking. If you do, you should be asked to insert a Project-Name.
 
+### Migrate `times.json`
+
+For better flexibility each `times.json` has a version property (except for version 1). This is useful to support breaking changes without changing each `times.json` file.
+Therefore it could be, that you have to upgrade the `times.json` to use the newest features (like multiple projects).
+You should be asked when you open a folder to migrate to the newest version. However, you can also trigger this by activating the command `Time-Tracker: Migrate Storage File`.
+
 ## Credits
 
 Work Time Tracker was created by [S-Mitterlehner](https://github.com/S-Mitterlehner).

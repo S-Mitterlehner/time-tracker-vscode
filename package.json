@@ -2,7 +2,7 @@
   "name": "time-tracker-vscode",
   "displayName": "Time Tracker VSCode",
   "description": "Extension to track time spent on projects and keep the data save in your folder",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": {
     "name": "Stefan Mitterlehner",
     "url": "https://www.mitterlehner.click"
@@ -44,6 +44,10 @@
       {
         "command": "time-tracker.totalTimeSpent",
         "title": "Time-Tracker: Total Time Spent"
+      },
+      {
+        "command": "time-tracker.migrate",
+        "title": "Time-Tracker: Migrate Storage File"
       }
     ]
   },
