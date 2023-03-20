@@ -38,6 +38,10 @@ For better flexibility each `times.json` has a version property (except for vers
 Therefore it could be, that you have to upgrade the `times.json` to use the newest features (like multiple projects).
 You should be asked when you open a folder to migrate to the newest version. However, you can also trigger this by activating the command `Time-Tracker: Migrate Storage File`.
 
+## Contribute
+
+Please refer to the [contribution guidelines](./docs/contributions.md) page.
+
 ## Credits
 
 Work Time Tracker was created by [S-Mitterlehner](https://github.com/S-Mitterlehner).
