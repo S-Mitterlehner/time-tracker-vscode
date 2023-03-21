@@ -40,6 +40,12 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   );
 
   context.subscriptions.push(
+    vscode.commands.registerCommand('time-tracker.allowMultipleProjects', async () => {
+      await timeTracker.allowMultipleProjects();
+    }),
+  );
+
+  context.subscriptions.push(
     vscode.commands.registerCommand('time-tracker.migrate', () => {
       timeTracker.migrate();
     }),
