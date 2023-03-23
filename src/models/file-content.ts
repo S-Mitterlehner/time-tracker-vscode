@@ -14,5 +14,7 @@ export type FileContentV1 = TimeEntry[];
 export class FileContentV2 {
   version: string = '2';
   allowMultipleProjects: boolean = false;
+  askForProductivityFactor: boolean = false;
+  defaultProductivityFactor: number = 1;
   times?: Times;
 }

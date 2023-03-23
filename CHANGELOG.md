@@ -5,6 +5,14 @@
     Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 -->
 
+## [0.1.2]
+
+### Added
+
+- `allowMultipleProjects` via command
+- `productivityFactor`
+- bugfixes
+
 ## [0.1.1]
 
 ### Added
