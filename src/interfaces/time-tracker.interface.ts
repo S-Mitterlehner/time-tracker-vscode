@@ -5,4 +5,5 @@ export interface ITimeTracker {
   startTracking(): Promise<void>;
   stopTracking(): Promise<void>;
   printTime(): Promise<void>;
+  allowMultipleProjects(): Promise<void>;
 }

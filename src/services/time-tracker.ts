@@ -123,6 +123,15 @@ export class TimeTracker implements ITimeTracker {
     this.interaction.showInformationMessage(`You have worked ${hours} hour(s) ${minutes} minute(s) ${seconds} second(s).`);
   }
 
+  allowMultipleProjects(): Promise<void> {
+    if (this._version === '1') throw new Error('Not supported! Please migrate to a newer version first.');
+    const contentV2 = this._content as FileContentV2;
+    contentV2.allowMultipleProjects = true;
+    this.fileManager.writeToFile(path.resolve(this.interaction.getWorkspacePath(), FILE_REL_PATH), this._content);
+    this.interaction.showInformationMessage('Multiple projects are now allowed.');
+    return Promise.resolve();
+  }
+
   private async _getProject(allowNew: boolean = true): Promise<string> {
     if (this.project) return this.project;
 
