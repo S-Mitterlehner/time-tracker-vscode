@@ -109,7 +109,7 @@ export class TimeTracker implements ITimeTracker {
         const contentV2 = this._content as FileContentV2;
         if (!contentV2.times) break;
         let project = await this._getProject(false);
-        const times = contentV2.times[project];
+        const times = contentV2.times[project] ?? [];
         seconds = times.reduce((sum, x) => sum + this._getTimeSec(x), 0);
         break;
       default:
