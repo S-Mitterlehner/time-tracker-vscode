@@ -29,16 +29,6 @@ export class VSCodeInteractionService implements IInteractionService {
     }
   }
 
-  getWorkspacePath(): string {
-    try {
-      const result = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
-      if (!result) throw new Error('No workspace opened');
-      return result;
-    } catch (e) {
-      throw new Error('No workspace opened');
-    }
-  }
-
   showInformationMessage(message: string): void {
     vscode.window.showInformationMessage(message);
   }

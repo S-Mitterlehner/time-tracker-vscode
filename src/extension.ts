@@ -1,59 +1,88 @@
 import * as vscode from 'vscode';
-import { MigratorFactory } from './migrators/factory.migrator';
+import { TrackingStatus } from './enums/tracking-status';
+import { IFileManager } from './interfaces/file-manager.interface';
+import { IInteractionService } from './interfaces/interaction-service.interface';
+import { ITimeTracker } from './interfaces/time-tracker.interface';
+import { MigrationManager as MigratorManager } from './factories/factory.migrator';
 import { V1ToV2Migrator } from './migrators/v1-to-v2.migrator';
 import { FileManager } from './services/file-manager';
-import { TimeTracker } from './services/time-tracker';
+import { TimeTrackerFactory } from './factories/time-tracker-factory';
 import { VSCodeInteractionService } from './services/vscode-service';
 
-const migratorFactory = new MigratorFactory(new V1ToV2Migrator());
-const fileManager = new FileManager();
-const vscService = new VSCodeInteractionService();
-const timeTracker = new TimeTracker(fileManager, vscService, migratorFactory);
+const fileManager: IFileManager = new FileManager();
+const vscService: IInteractionService = new VSCodeInteractionService();
+const migrator = new MigratorManager(fileManager, vscService, new V1ToV2Migrator());
+const factory = new TimeTrackerFactory(fileManager, vscService);
+let timeTracker: ITimeTracker | undefined = undefined;
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
-  context.subscriptions.push(vscode.commands.registerCommand('time-tracker.init', async () => await timeTracker.init()));
-
+  // V1
   context.subscriptions.push(
+    vscode.commands.registerCommand('time-tracker.init', async () => {
+      if (fileManager.isSaving()) return;
+      timeTracker = factory.createFromWorkspace();
+    }),
     vscode.commands.registerCommand('time-tracker.startTrackingTime', async () => {
       try {
-        await timeTracker.startTracking();
+        await timeTracker?.startTracking();
       } catch (error: any) {
         vscode.window.showErrorMessage(error.message);
       }
     }),
     vscode.commands.registerCommand('time-tracker.stopTrackingTime', async () => {
       try {
-        await timeTracker.stopTracking();
+        await timeTracker?.stopTracking();
       } catch (error: any) {
         vscode.window.showErrorMessage(error.message);
       }
     }),
     vscode.commands.registerCommand('time-tracker.totalTimeSpent', () => {
-      timeTracker.printTime();
+      try {
+        timeTracker?.printTime();
+      } catch (error: any) {
+        vscode.window.showErrorMessage(error.message);
+      }
     }),
   );
 
+  // V2
   context.subscriptions.push(
     vscode.commands.registerCommand('time-tracker.allowMultipleProjects', async () => {
-      await timeTracker.allowMultipleProjects();
-    }),
-    vscode.commands.registerCommand('time-tracker.migrate', () => {
-      timeTracker.migrate();
+      try {
+        await timeTracker?.allowMultipleProjects();
+      } catch (error: any) {
+        vscode.window.showErrorMessage(error.message);
+      }
     }),
     vscode.commands.registerCommand('time-tracker.toggleAskProductivityFactor', () => {
-      timeTracker.toggleAskProductivityFactor();
+      try {
+        timeTracker?.toggleAskProductivityFactor();
+      } catch (error: any) {
+        vscode.window.showErrorMessage(error.message);
+      }
     }),
   );
 
+  // Migrate
   context.subscriptions.push(
-    vscode.workspace.onDidChangeWorkspaceFolders(async (event) => {
-      await timeTracker.stopTracking();
-      await timeTracker.init();
+    vscode.commands.registerCommand('time-tracker.migrate', () => {
+      try {
+        migrator.checkAndMigrate(true).then((migrated) => {
+          if (migrated) vscode.commands.executeCommand('time-tracker.init');
+        });
+      } catch (error: any) {
+        vscode.window.showErrorMessage(error.message);
+      }
     }),
   );
 
+  // Watcher
   const watcher = vscode.workspace.createFileSystemWatcher(`${vscode.workspace.workspaceFolders?.[0].uri.fsPath}/.vscode/times.json`);
   context.subscriptions.push(
+    vscode.workspace.onDidChangeWorkspaceFolders(async (event) => {
+      if (timeTracker?.getTrackingStatus() === TrackingStatus.Tracking) await timeTracker?.stopTracking();
+      vscode.commands.executeCommand('time-tracker.init');
+    }),
     watcher.onDidChange((event) => {
       vscode.commands.executeCommand('time-tracker.init');
     }),
@@ -69,9 +98,12 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   item.tooltip = 'Click to start tracking time';
   item.command = 'time-tracker.startTrackingTime';
 
-  await timeTracker.init();
+  migrator.checkAndMigrate(false).then((migrated) => {
+    if (migrated) vscode.commands.executeCommand('time-tracker.init');
+  });
+  timeTracker = factory.createFromWorkspace();
 }
 
 export async function deactivate(): Promise<void> {
-  await timeTracker.stopTracking();
+  if (timeTracker?.getTrackingStatus() === TrackingStatus.Tracking) await timeTracker?.stopTracking();
 }

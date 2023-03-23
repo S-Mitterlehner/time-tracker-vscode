@@ -1,12 +1,20 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { IFileManager } from '../interfaces/file-manager.interface';
 
 const formattedRegex = /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/;
 const utcRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 
-export class FileManager {
-  public writeToFile(filePath: string, data: any) {
-    console.log('writeToFile', filePath, data);
+export class FileManager implements IFileManager {
+  private _isSaving = false;
+  isSaving(): boolean {
+    const result = this._isSaving;
+    if (result) setTimeout(() => (this._isSaving = false), 500); // Bugfix for init on save
+    return result;
+  }
+
+  public writeToFile(filePath: string, data: any): void {
+    this._isSaving = true;
     const folder = path.dirname(filePath);
 
     if (!fs.existsSync(folder)) {
@@ -36,7 +44,7 @@ export class FileManager {
     );
   }
 
-  public readFromFile(filePath: string) {
+  public readFromFile(filePath: string): any {
     if (!fs.existsSync(filePath)) {
       return null;
     }
