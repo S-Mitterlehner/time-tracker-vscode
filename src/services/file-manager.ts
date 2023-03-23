@@ -15,20 +15,24 @@ export class FileManager {
 
     fs.writeFileSync(
       filePath,
-      JSON.stringify(data, (key, value) => {
-        if (value !== undefined && utcRegex.test(value.toString())) {
-          value = new Date(Date.parse(value));
-          const year = value.getFullYear();
-          const month = ('00' + (value.getMonth() + 1)).slice(-2);
-          const day = ('00' + value.getDate()).slice(-2);
-          const hour = ('00' + value.getHours()).slice(-2);
-          const minute = ('00' + value.getMinutes()).slice(-2);
-          const second = ('00' + value.getSeconds()).slice(-2);
+      JSON.stringify(
+        data,
+        (key, value) => {
+          if (value !== undefined && utcRegex.test(value.toString())) {
+            value = new Date(Date.parse(value));
+            const year = value.getFullYear();
+            const month = ('00' + (value.getMonth() + 1)).slice(-2);
+            const day = ('00' + value.getDate()).slice(-2);
+            const hour = ('00' + value.getHours()).slice(-2);
+            const minute = ('00' + value.getMinutes()).slice(-2);
+            const second = ('00' + value.getSeconds()).slice(-2);
 
-          return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
-        }
-        return value;
-      }),
+            return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+          }
+          return value;
+        },
+        2,
+      ),
     );
   }
 

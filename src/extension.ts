@@ -21,9 +21,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         vscode.window.showErrorMessage(error.message);
       }
     }),
-  );
-
-  context.subscriptions.push(
     vscode.commands.registerCommand('time-tracker.stopTrackingTime', async () => {
       try {
         await timeTracker.stopTracking();
@@ -31,9 +28,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         vscode.window.showErrorMessage(error.message);
       }
     }),
-  );
-
-  context.subscriptions.push(
     vscode.commands.registerCommand('time-tracker.totalTimeSpent', () => {
       timeTracker.printTime();
     }),
@@ -43,11 +37,11 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     vscode.commands.registerCommand('time-tracker.allowMultipleProjects', async () => {
       await timeTracker.allowMultipleProjects();
     }),
-  );
-
-  context.subscriptions.push(
     vscode.commands.registerCommand('time-tracker.migrate', () => {
       timeTracker.migrate();
+    }),
+    vscode.commands.registerCommand('time-tracker.toggleAskProductivityFactor', () => {
+      timeTracker.toggleAskProductivityFactor();
     }),
   );
 
@@ -55,6 +49,16 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     vscode.workspace.onDidChangeWorkspaceFolders(async (event) => {
       await timeTracker.stopTracking();
       await timeTracker.init();
+    }),
+  );
+
+  const watcher = vscode.workspace.createFileSystemWatcher(`${vscode.workspace.workspaceFolders?.[0].uri.fsPath}/.vscode/times.json`);
+  context.subscriptions.push(
+    watcher.onDidChange((event) => {
+      vscode.commands.executeCommand('time-tracker.init');
+    }),
+    watcher.onDidCreate((event) => {
+      vscode.commands.executeCommand('time-tracker.init');
     }),
   );
 

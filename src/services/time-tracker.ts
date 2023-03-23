@@ -47,18 +47,6 @@ export class TimeTracker implements ITimeTracker {
     this.interaction.setButtonStatus(this.trackingStatus);
   }
 
-  migrate(): void {
-    if (this._version >= CURRENT_VERSION) {
-      this.interaction.showInformationMessage('times.json is already on the newest version.');
-      return;
-    }
-
-    this._content = this.migratorFactory.getMigrator(this._version, CURRENT_VERSION)?.migrate(this._content as FileContent) as FileContent;
-    this._version = CURRENT_VERSION;
-    this.fileManager.writeToFile(path.resolve(this.interaction.getWorkspacePath(), FILE_REL_PATH), this._content);
-    this.interaction.showInformationMessage('times.json has been migrated to the newest version.');
-  }
-
   async startTracking() {
     if (this.trackingStatus === TrackingStatus.Tracking) throw new Error('Already tracking.');
     switch (this._version) {
@@ -90,7 +78,26 @@ export class TimeTracker implements ITimeTracker {
     const current = this._getCurrentEntry() as TimeEntry;
 
     current.comment = await this.interaction.showInputBox('Enter a comment (optional):', undefined, []);
+    if (current.comment === '') current.comment = undefined;
     current.till = new Date();
+
+    if (this._version === '2') {
+      const contentV2 = this._getContentAsV2Safe();
+
+      contentV2.defaultProductivityFactor = contentV2.defaultProductivityFactor ?? 1;
+
+      if (contentV2.askForProductivityFactor) {
+        const productivityFactor = await this.interaction.showInputBox(
+          `Enter a productivity factor (optional, default: ${contentV2.defaultProductivityFactor}):`,
+          undefined,
+          [],
+        );
+        if (productivityFactor) {
+          const f = parseFloat(productivityFactor);
+          if (!Number.isNaN(f)) current.productivityFactor = f;
+        }
+      }
+    }
 
     this.fileManager.writeToFile(path.resolve(this.interaction.getWorkspacePath(), FILE_REL_PATH), this._content);
     this.interaction.setButtonStatus(TrackingStatus.NotTracking);
@@ -109,8 +116,8 @@ export class TimeTracker implements ITimeTracker {
         const contentV2 = this._content as FileContentV2;
         if (!contentV2.times) break;
         let project = await this._getProject(false);
-        const times = contentV2.times[project];
-        seconds = times.reduce((sum, x) => sum + this._getTimeSec(x), 0);
+        const times = contentV2.times[project] ?? [];
+        seconds = times.reduce((sum, x) => sum + this._getTimeSec(x) * (x.productivityFactor ?? contentV2.defaultProductivityFactor ?? 1), 0);
         break;
       default:
         throw new Error(`Unknown version: ${this._version}`);
@@ -123,13 +130,42 @@ export class TimeTracker implements ITimeTracker {
     this.interaction.showInformationMessage(`You have worked ${hours} hour(s) ${minutes} minute(s) ${seconds} second(s).`);
   }
 
+  migrate(): void {
+    if (this._version >= CURRENT_VERSION) {
+      this.interaction.showInformationMessage('times.json is already on the newest version.');
+      return;
+    }
+
+    this._content = this.migratorFactory.getMigrator(this._version, CURRENT_VERSION)?.migrate(this._content as FileContent) as FileContent;
+    this._version = CURRENT_VERSION;
+    this.fileManager.writeToFile(path.resolve(this.interaction.getWorkspacePath(), FILE_REL_PATH), this._content);
+    this.interaction.showInformationMessage('times.json has been migrated to the newest version.');
+  }
+
   allowMultipleProjects(): Promise<void> {
-    if (this._version === '1') throw new Error('Not supported! Please migrate to a newer version first.');
-    const contentV2 = this._content as FileContentV2;
+    const contentV2 = this._getContentAsV2Safe();
     contentV2.allowMultipleProjects = true;
     this.fileManager.writeToFile(path.resolve(this.interaction.getWorkspacePath(), FILE_REL_PATH), this._content);
     this.interaction.showInformationMessage('Multiple projects are now allowed.');
     return Promise.resolve();
+  }
+
+  toggleAskProductivityFactor() {
+    const contentV2 = this._getContentAsV2Safe();
+    contentV2.askForProductivityFactor = !contentV2.askForProductivityFactor;
+    this.fileManager.writeToFile(path.resolve(this.interaction.getWorkspacePath(), FILE_REL_PATH), this._content);
+    this.interaction.showInformationMessage(
+      contentV2.askForProductivityFactor
+        ? 'You will now be asked for a productivity factor.'
+        : 'You will no longer be asked for a productivity factor.',
+    );
+    return Promise.resolve();
+  }
+
+  private _getContentAsV2Safe(): FileContentV2 {
+    if (this._version === '1') throw new Error('Not supported! Please migrate to a newer version first.');
+    const contentV2 = this._content as FileContentV2;
+    return this._content as FileContentV2;
   }
 
   private async _getProject(allowNew: boolean = true): Promise<string> {
@@ -138,7 +174,6 @@ export class TimeTracker implements ITimeTracker {
     switch (this._version) {
       case '1':
         throw new Error('Not supported');
-        break;
       case '2':
         const contentV2 = this._content as FileContentV2;
         if (contentV2.allowMultipleProjects !== true) return 'index';
@@ -146,7 +181,9 @@ export class TimeTracker implements ITimeTracker {
         if (!allowNew) return (await this.interaction.showQuickPick('Select a project:', Object.keys(contentV2.times ?? {}))) ?? 'index';
 
         const projects = contentV2.times ? Object.keys(contentV2.times) : [];
-        return (await this.interaction.showInputBox('Enter a project name (index):', 'index', projects)) ?? 'index';
+        let result = await this.interaction.showInputBox('Enter a project name (index):', 'index', projects);
+        if (result === undefined || result === null || result === '') result = 'index';
+        return result;
       default:
         throw new Error(`Unknown version: ${this._version}`);
     }

@@ -52,6 +52,10 @@
       {
         "command": "time-tracker.allowMultipleProjects",
         "title": "Time-Tracker: Allow Multiple Projects"
+      },
+      {
+        "command": "time-tracker.toggleAskProductivityFactor",
+        "title": "Time-Tracker: Toggle Ask for Productivity Factor"
       }
     ]
   },
