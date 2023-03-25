@@ -7,6 +7,7 @@
     "name": "Stefan Mitterlehner",
     "url": "https://www.mitterlehner.click"
   },
+  "icon": "images/logo_512x512.png",
   "publisher": "S-Mitterlehner",
   "license": "MIT",
   "pricing": "Free",
