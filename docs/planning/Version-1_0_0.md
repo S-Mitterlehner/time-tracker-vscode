@@ -3,6 +3,7 @@
 ## Planned
 
 - Restructuring (completed)
+- Logo (completed)
 - Move settings into VsCode-Settings
   - allowMultipleProject
   - askForProductivityFactor

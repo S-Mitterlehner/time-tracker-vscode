@@ -58,6 +58,33 @@
         "command": "time-tracker.toggleAskProductivityFactor",
         "title": "Time-Tracker: Toggle Ask for Productivity Factor"
       }
+    ],
+    "configuration": [
+      {
+        "title": "Time-Tracker VSCode",
+        "properties": {
+          "time-tracker-vscode.askProductivityFactor": {
+            "type": "boolean",
+            "default": true,
+            "description": "Ask for productivity factor when stopping tracking time"
+          },
+          "time-tracker-vscode.defaultProductivityFactor": {
+            "type": "number",
+            "default": 1,
+            "description": "Default productivity factor when stopping tracking time"
+          },
+          "time-tracker-vscode.allowMultipleProjects": {
+            "type": "boolean",
+            "default": false,
+            "description": "Allow multiple projects to be tracked at the same time"
+          },
+          "time-tracker-vscode.defaultProject": {
+            "type": "string",
+            "default": "index",
+            "description": "Default project to track time for"
+          }
+        }
+      }
     ]
   },
   "scripts": {

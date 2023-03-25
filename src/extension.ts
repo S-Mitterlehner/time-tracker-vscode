@@ -3,15 +3,14 @@ import { TrackingStatus } from './enums/tracking-status';
 import { IFileManager } from './interfaces/file-manager.interface';
 import { IInteractionService } from './interfaces/interaction-service.interface';
 import { ITimeTracker } from './interfaces/time-tracker.interface';
-import { MigrationManager as MigratorManager } from './factories/factory.migrator';
-import { V1ToV2Migrator } from './migrators/v1-to-v2.migrator';
 import { FileManager } from './services/file-manager';
 import { TimeTrackerFactory } from './factories/time-tracker-factory';
 import { VSCodeInteractionService } from './services/vscode-service';
+import { createMigratorManager } from './migrations';
 
 const fileManager: IFileManager = new FileManager();
 const vscService: IInteractionService = new VSCodeInteractionService();
-const migrator = new MigratorManager(fileManager, vscService, new V1ToV2Migrator());
+const migrator = createMigratorManager(fileManager, vscService);
 const factory = new TimeTrackerFactory(fileManager, vscService);
 let timeTracker: ITimeTracker | undefined = undefined;
 
