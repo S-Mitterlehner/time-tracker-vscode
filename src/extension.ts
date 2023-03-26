@@ -7,6 +7,7 @@ import { FileManager } from './services/file-manager';
 import { TimeTrackerFactory } from './factories/time-tracker-factory';
 import { VSCodeInteractionService } from './services/vscode-service';
 import { createMigratorManager } from './migrations';
+import { IConfiguration } from './interfaces/configuration.interface';
 
 const fileManager: IFileManager = new FileManager();
 const vscService: IInteractionService = new VSCodeInteractionService();

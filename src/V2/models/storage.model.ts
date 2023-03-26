@@ -7,6 +7,7 @@ export type Times = {
 
 export class Storage implements IConfiguration {
   version: string = '2';
+  defaultProject: string | undefined;
   allowMultipleProjects: boolean = false;
   askForProductivityFactor: boolean = false;
   defaultProductivityFactor: number = 1;

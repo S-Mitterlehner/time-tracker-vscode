@@ -52,18 +52,30 @@ If you want to insert the factor when you stopped tracking, you can activate thi
 | `Time-Tracker: Stop Tracking Work Time`            | `time-tracker.stopTrackingTime`            | Stops tracking work time and saves the time spent                                          | `1`+                         |
 | `Time-Tracker: Total Time Spent`                   | `time-tracker.totalTimeSpent`              | Displays the total time spent on the selected project (index if not set)                   | `1`+                         |
 | `Time-Tracker: Migrate Storage File`               | `time-tracker.migrate`                     | Migrates the Time-Tracker storage file to a new version of the `times.json`                | `2`+                         |
-| `Time-Tracker: Allow Multiple Projects`            | `time-tracker.allowMultipleProjects`       | Enables tracking time for multiple projects simultaneously. this cannot be undone.         | `2`+                         |
-| `Time-Tracker: Toggle Ask for Productivity Factor` | `time-tracker.toggleAskProductivityFactor` | Toggles whether or not to ask for a productivity factor when stopping the time tracking    | `2`+                         |
+| `Time-Tracker: Allow Multiple Projects`            | `time-tracker.allowMultipleProjects`       | Enables tracking time for multiple projects. this cannot be undone.                        | `2`                          |
+| `Time-Tracker: Toggle Ask for Productivity Factor` | `time-tracker.toggleAskProductivityFactor` | Toggles whether or not to ask for a productivity factor when stopping the time tracking    | `2`                          |
 
 ## `times.json`
 
 The `times.json` is the storage file of the extension for each workspace. During the development there are different Versions of this file. The `times.json` is fully backwards compatible and can be migrated at all times.
 
-Current Version: [V2](docs/storage/v2.md)
+Current Version: [V3](docs/storage/v3.md)
 
 ### Older Versions
 
+- [V2](docs/storage/v2.md)
 - [V1](docs/storage/v1.md)
+
+## Configuration
+
+With V3 some settings have been moved from the `times.json` to the VSCode settings.
+
+| Setting                     | Settings-ID                                     | Description                                                                                               |
+| --------------------------- | ----------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Allow Multiple Projects     | `time-tracker-vscode.allowMultipleProjects`     | Enables tracking time for multiple projects                                                               |
+| Ask for Productivity Factor | `time-tracker-vscode.askProductivityFactor`     | Toggles whether or not to ask for a productivity factor when stopping the time tracking                   |
+| Default Productivity Factor | `time-tracker-vscode.defaultProductivityFactor` | Sets the default productivity factor                                                                      |
+| Default Project             | `time-tracker-vscode.defaultProject`            | Sets the name of the default project. This will also apply when you don't have multiple projects enabled. |
 
 ## Contribute
 

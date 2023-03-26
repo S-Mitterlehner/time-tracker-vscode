@@ -63,7 +63,7 @@ export class VSCodeInteractionService implements IInteractionService {
   }
 
   fillConfig(data: IConfiguration): void {
-    const config = vscode.workspace.getConfiguration('time-tracker');
+    const config = vscode.workspace.getConfiguration('time-tracker-vscode');
     data.allowMultipleProjects = config.get('allowMultipleProjects', false);
     data.askForProductivityFactor = config.get('askForProductivityFactor', false);
     data.defaultProductivityFactor = config.get('defaultProductivityFactor', 1);

@@ -5,6 +5,7 @@ import { getPath } from '../contants';
 import * as V1 from '../V1';
 import * as V2 from '../V2';
 import * as V3 from '../V3';
+import { IConfiguration } from '../interfaces/configuration.interface';
 
 export type Storage = V1.Storage | StorageWithVersion;
 export type StorageWithVersion = V2.Storage | V3.Storage;
@@ -12,13 +13,21 @@ export type StorageWithVersion = V2.Storage | V3.Storage;
 export class TimeTrackerFactory {
   constructor(private _fileManager: IFileManager, private _interaction: IInteractionService) {}
 
-  private _createNewsest(): ITimeTracker {
-    return new V3.TimeTracker(new V3.Storage(), this._fileManager, this._interaction);
+  private _createNewsest(config: IConfiguration): ITimeTracker {
+    return new V3.TimeTracker(new V3.Storage(), this._fileManager, this._interaction, config);
   }
 
   create(storage: Storage | undefined): ITimeTracker {
+    let config: IConfiguration = {
+      allowMultipleProjects: false,
+      askForProductivityFactor: false,
+      defaultProductivityFactor: 1,
+      defaultProject: 'index',
+    };
+    this._interaction.fillConfig(config);
+
     if (!storage) {
-      return this._createNewsest();
+      return this._createNewsest(config);
     }
 
     if (!(storage as any)['version']) {
@@ -29,7 +38,7 @@ export class TimeTrackerFactory {
 
     switch (s.version) {
       case '3':
-        return new V3.TimeTracker(s as V3.Storage, this._fileManager, this._interaction);
+        return new V3.TimeTracker(s as V3.Storage, this._fileManager, this._interaction, config);
       case '2':
         return new V2.TimeTracker(s as V2.Storage, this._fileManager, this._interaction);
       default:

@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 
 export const FILE_REL_PATH = '.vscode/times.json'; // TODO: move to config
-export const NEWEST_VERSION = '2';
+export const NEWEST_VERSION = '3';
 
 export function getPath(): string {
   try {
