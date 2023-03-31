@@ -2,11 +2,12 @@
   "name": "time-tracker-vscode",
   "displayName": "Time Tracker VSCode",
   "description": "Extension to track time spent on projects and keep the data save in your folder",
-  "version": "0.1.2",
+  "version": "1.0.0",
   "author": {
     "name": "Stefan Mitterlehner",
     "url": "https://www.mitterlehner.click"
   },
+  "icon": "images/logo_512x512.png",
   "publisher": "S-Mitterlehner",
   "license": "MIT",
   "pricing": "Free",
@@ -57,6 +58,33 @@
         "command": "time-tracker.toggleAskProductivityFactor",
         "title": "Time-Tracker: Toggle Ask for Productivity Factor"
       }
+    ],
+    "configuration": [
+      {
+        "title": "Time-Tracker VSCode",
+        "properties": {
+          "time-tracker-vscode.askProductivityFactor": {
+            "type": "boolean",
+            "default": true,
+            "description": "Ask for productivity factor when stopping tracking time"
+          },
+          "time-tracker-vscode.defaultProductivityFactor": {
+            "type": "number",
+            "default": 1,
+            "description": "Default productivity factor when stopping tracking time"
+          },
+          "time-tracker-vscode.allowMultipleProjects": {
+            "type": "boolean",
+            "default": false,
+            "description": "Allow multiple projects to be tracked at the same time"
+          },
+          "time-tracker-vscode.defaultProject": {
+            "type": "string",
+            "default": "index",
+            "description": "Default project to track time for"
+          }
+        }
+      }
     ]
   },
   "scripts": {
@@ -79,6 +107,7 @@
     "@typescript-eslint/eslint-plugin": "^5.53.0",
     "@typescript-eslint/parser": "^5.53.0",
     "@vscode/test-electron": "^2.2.3",
+    "@vscode/vsce": "^2.18.0",
     "eslint": "^8.34.0",
     "glob": "^8.1.0",
     "mocha": "^10.2.0",

@@ -1,7 +1,8 @@
 import { IMigrator } from '../interfaces/migrator.interface';
-import { FileContentV1, FileContentV2 } from '../models/file-content';
+import * as V1 from '../V1';
+import * as V2 from '../V2';
 
-export class V1ToV2Migrator implements IMigrator<FileContentV1, FileContentV2> {
+export class V1ToV2Migrator implements IMigrator<V1.Storage, V2.Storage> {
   get oldVersion(): string {
     return '1';
   }
@@ -9,8 +10,8 @@ export class V1ToV2Migrator implements IMigrator<FileContentV1, FileContentV2> {
     return '2';
   }
 
-  migrate(old: FileContentV1): FileContentV2 {
-    const result = new FileContentV2();
+  migrate(old: V1.Storage): V2.Storage {
+    const result = new V2.Storage();
     result.version = '2';
     result.allowMultipleProjects = false;
     result.times = { index: old };

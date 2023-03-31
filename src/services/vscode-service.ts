@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { TrackingStatus } from '../enums/tracking-status';
+import { IConfiguration } from '../interfaces/configuration.interface';
 import { IInteractionService } from '../interfaces/interaction-service.interface';
 
 export class VSCodeInteractionService implements IInteractionService {
@@ -26,16 +27,6 @@ export class VSCodeInteractionService implements IInteractionService {
       default:
         this.statusBarButton.hide();
         break;
-    }
-  }
-
-  getWorkspacePath(): string {
-    try {
-      const result = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
-      if (!result) throw new Error('No workspace opened');
-      return result;
-    } catch (e) {
-      throw new Error('No workspace opened');
     }
   }
 
@@ -69,5 +60,13 @@ export class VSCodeInteractionService implements IInteractionService {
 
   async showQuickPick(message: string, values: string[]): Promise<string> {
     return (await vscode.window.showQuickPick(values, { placeHolder: message })) ?? 'index';
+  }
+
+  fillConfig(data: IConfiguration): void {
+    const config = vscode.workspace.getConfiguration('time-tracker-vscode');
+    data.allowMultipleProjects = config.get('allowMultipleProjects', false);
+    data.askForProductivityFactor = config.get('askForProductivityFactor', false);
+    data.defaultProductivityFactor = config.get('defaultProductivityFactor', 1);
+    data.defaultProject = config.get('defaultProject', 'index');
   }
 }
