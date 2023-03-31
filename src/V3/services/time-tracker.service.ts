@@ -80,16 +80,21 @@ export class TimeTracker extends TimeTrackerBase<Storage, TimeEntry> {
   }
 
   private async _getProject(allowNew: boolean = true): Promise<string> {
-    if (this._config.allowMultipleProjects !== true) return 'index';
+    if (this._config.allowMultipleProjects !== true) return this.getDefaultProject();
 
-    if (!allowNew) return (await this.interaction.showQuickPick('Select a project:', Object.keys(this.storage.projects ?? {}))) ?? 'index';
+    if (!allowNew)
+      return (await this.interaction.showQuickPick('Select a project:', Object.keys(this.storage.projects ?? {}))) ?? this.getDefaultProject();
 
     const projects = this.storage.projects ? Object.keys(this.storage.projects) : [];
-    let result = await this.interaction.showInputBox('Enter a project name (index):', 'index', projects);
+    let result = await this.interaction.showInputBox('Enter a project name (index):', this.getDefaultProject(), projects);
 
-    if (result === undefined || result === null || result === '') result = this._config.defaultProject ?? 'index';
+    if (result === undefined || result === null || result === '') result = this.getDefaultProject();
 
     return result;
+  }
+
+  private getDefaultProject(): string {
+    return this._config.defaultProject ?? 'index';
   }
 
   private _getTimeSec(entry: TimeEntry) {
