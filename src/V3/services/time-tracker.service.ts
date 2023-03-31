@@ -87,7 +87,7 @@ export class TimeTracker extends TimeTrackerBase<Storage, TimeEntry> {
     const projects = this.storage.projects ? Object.keys(this.storage.projects) : [];
     let result = await this.interaction.showInputBox('Enter a project name (index):', 'index', projects);
 
-    if (result === undefined || result === null || result === '') result = 'index';
+    if (result === undefined || result === null || result === '') result = this._config.defaultProject ?? 'index';
 
     return result;
   }

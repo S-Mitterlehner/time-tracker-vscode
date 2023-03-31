@@ -4,12 +4,12 @@
 
 - Restructuring (completed)
 - Logo (completed)
-- Move settings into VsCode-Settings
+- Move settings into VsCode-Settings (completed)
   - allowMultipleProject
   - askForProductivityFactor
   - defaultProductivityFactor
   - location of times.json (?)
-- change Storage -> [V3](../storage/v3.md)
+- change Storage -> [V3](../storage/v3.md) (completed)
   - `times` -> rename to `projects`
   - projects can have additional settings (like `defaultProductivityFactor`)
   - defaultProject -> project that will be used, when empty insert
