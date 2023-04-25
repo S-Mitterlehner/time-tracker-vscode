@@ -1,4 +1,4 @@
-# Version 1.0.0 - Main Release
+# Version 1.0.0 - Main Release -> shipped
 
 ## Planned
 
